@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
@@ -16,7 +16,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(username, password)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.detail || 'Login failed. Check your credentials.')
     } finally {
@@ -68,6 +68,9 @@ export default function Login() {
 
           <p className="text-[11px] text-text-dim text-center pt-1">
             Demo accounts — admin / admin123 · manager / manager123
+          </p>
+          <p className="text-[11px] text-text-dim text-center">
+            New here? <Link to="/register" className="text-violet hover:underline">Create an account</Link>
           </p>
         </form>
       </div>

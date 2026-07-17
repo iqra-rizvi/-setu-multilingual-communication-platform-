@@ -9,6 +9,11 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null
   })
 
+  async function register(payload) {
+    await api.post('/auth/register', payload)
+    return login(payload.username, payload.password)
+  }
+
   async function login(username, password) {
     const form = new URLSearchParams()
     form.append('username', username)
@@ -29,7 +34,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   )

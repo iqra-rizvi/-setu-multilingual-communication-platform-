@@ -51,15 +51,17 @@ Open http://localhost:5173
 
 ## Demo walkthrough
 
-1. Log in as `manager`.
-2. **Audience** — view/add recipients, filter by language/state/occupation/organization.
-3. **Campaigns → New Campaign** — name it, write a one-line brief, pick a type.
-4. On the campaign page:
-   - **Step 1** — generate AI content from your brief in a chosen tone.
+1. Visit the **landing page** (`/`) — sign in or create a new account.
+2. Log in as `manager` (or register your own account).
+3. **Dashboard** — 6 campaigns are pre-seeded with real generated/translated/dispatched data, so charts are populated immediately.
+4. **Audience** — view/add recipients, filter by language/state/occupation/organization.
+5. **Templates** — reusable content library (4 seeded examples).
+6. **Campaigns** — see the 6 seeded campaigns, or create a new one:
+   - **Step 1** — generate AI content from a brief in a chosen tone.
    - **Step 2** — select target Indian languages and translate.
-   - **Step 3** — pick channels and dispatch (simulates realistic delivered/sent/failed outcomes).
-   - **Step 4** — engagement analytics appear once messages/events exist.
-5. **Dashboard** — overall reach, language-wise "broadcast pulse," channel mix, delivery/open/click rates.
+   - **Step 3** — pick channels and dispatch (each recipient gets a personalized message).
+7. **Analytics** — per-campaign delivery/open/click rates in one table.
+8. **Feedback** — every recipient comment across all campaigns, with AI sentiment analysis.
 
 ## Project structure
 ```
@@ -81,7 +83,8 @@ backend/
 
 frontend/
   src/
-    pages/              Login, Dashboard, Audience, Campaigns, CampaignDetail
+    pages/              Landing, Login, Register, Dashboard, Audience, Campaigns,
+                         CampaignDetail, Templates, Analytics, Feedback
     components/         Sidebar, StatCard, ProtectedRoute
     context/AuthContext.jsx
     api.js               Axios client with JWT interceptor

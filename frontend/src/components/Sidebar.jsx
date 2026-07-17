@@ -3,9 +3,12 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const items = [
-  { to: '/', label: 'Dashboard', glyph: '◆' },
+  { to: '/dashboard', label: 'Dashboard', glyph: '◆' },
   { to: '/audience', label: 'Audience', glyph: '◈' },
   { to: '/campaigns', label: 'Campaigns', glyph: '▲' },
+  { to: '/templates', label: 'Templates', glyph: '▤' },
+  { to: '/analytics', label: 'Analytics', glyph: '◫' },
+  { to: '/feedback', label: 'Feedback', glyph: '✦' },
 ]
 
 export default function Sidebar() {
@@ -28,7 +31,7 @@ export default function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
+            end
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
