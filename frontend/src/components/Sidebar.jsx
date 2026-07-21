@@ -7,8 +7,11 @@ const items = [
   { to: '/audience', label: 'Audience', glyph: '◈' },
   { to: '/campaigns', label: 'Campaigns', glyph: '▲' },
   { to: '/templates', label: 'Templates', glyph: '▤' },
+  { to: '/live-bulletins', label: 'Live Bulletins', glyph: '◉' },
   { to: '/analytics', label: 'Analytics', glyph: '◫' },
   { to: '/feedback', label: 'Feedback', glyph: '✦' },
+  { to: '/sentiments', label: 'Sentiments', glyph: '☺' },
+  { to: '/canvas-studio', label: 'Canvas Studio', glyph: '🎨' },
 ]
 
 export default function Sidebar() {

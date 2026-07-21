@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import api from '../api'
+import { useNavigate } from "react-router-dom";
+import api from '../services/api'
 
 const TYPE_COLORS = {
   awareness: 'text-teal border-teal/30 bg-teal/10',
@@ -8,30 +9,74 @@ const TYPE_COLORS = {
   announcement: 'text-signal border-signal/30 bg-signal/10',
 }
 
+
 export default function Templates() {
+  const navigate = useNavigate();
+
   const [templates, setTemplates] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: '', category: 'awareness', content: '', language: 'English' })
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [selectedTemplate, setSelectedTemplate] = useState(null)
 
-  function load() {
-    api.get('/templates').then((res) => setTemplates(res.data))
+  async function openTemplate(id) {
+  try {
+    const res = await api.get(`/templates/${id}`)
+    setSelectedTemplate(res.data)
+  } catch (error) {
+    console.error("Failed to open template:", error)
   }
+}
 
-  useEffect(load, [])
+  async function load() {
+  try {
+    setLoading(true)
+    setError("")
+
+    const res = await api.get('/templates')
+
+    console.log("Templates API response:", res.data)
+
+    setTemplates(res.data)
+
+  } catch (err) {
+    setError("Failed to load templates")
+    console.error("Template loading error:", err)
+  } finally {
+    setLoading(false)
+  }
+}
+
+  useEffect(() => {
+  load()
+}, [])
 
   async function handleCreate(e) {
-    e.preventDefault()
+  e.preventDefault()
+
+  try {
     setSaving(true)
-    try {
-      await api.post('/templates', form)
-      setForm({ name: '', category: 'awareness', content: '', language: 'English' })
-      setShowForm(false)
-      load()
-    } finally {
-      setSaving(false)
-    }
+
+    await api.post('/templates/', form)
+
+    setForm({
+      name: '',
+      category: 'awareness',
+      content: '',
+      language: 'English'
+    })
+
+    setShowForm(false)
+    load()
+
+  } catch (error) {
+    console.error("Create template failed:", error)
+  } finally {
+    setSaving(false)
   }
+}
 
   return (
     <div>
@@ -97,11 +142,28 @@ export default function Templates() {
         </form>
       )}
 
+{loading && (
+  <p className="text-text-dim text-sm">Loading templates...</p>
+)}
+
+{error && (
+  <p className="text-danger text-sm">{error}</p>
+)}
+
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {templates.map((t) => (
-          <div key={t.id} className="bg-surface border border-border rounded-xl p-5">
+          <div
+  key={t.id}
+  onClick={() => openTemplate(t.id)}
+  className="bg-surface border border-border rounded-xl p-5 cursor-pointer hover:border-violet transition"
+>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-[11px] px-2 py-0.5 rounded-full border capitalize ${TYPE_COLORS[t.category]}`}>
+              <span
+  className={`text-[11px] px-2 py-0.5 rounded-full border capitalize ${
+    TYPE_COLORS[t.category] || 'text-gray-400 border-gray-400/30 bg-gray-400/10'
+  }`}
+>
                 {t.category}
               </span>
               <span className="text-[11px] text-text-dim">{t.language}</span>
@@ -116,6 +178,52 @@ export default function Templates() {
           </div>
         )}
       </div>
+
+      {selectedTemplate && (
+  <div
+  className="fixed inset-0 bg-black/50 flex items-center justify-center"
+  onClick={() => setSelectedTemplate(null)}
+>
+    <div
+ className="bg-surface rounded-xl p-6 w-[500px]"
+ onClick={(e)=>e.stopPropagation()}
+>
+      <h2 className="text-xl font-semibold mb-3">
+        {selectedTemplate.name}
+      </h2>
+
+      <p className="text-sm mb-3">
+        Category: {selectedTemplate.category}
+      </p>
+
+      <p className="text-sm mb-3">
+        Language: {selectedTemplate.language}
+      </p>
+
+      <p className="text-text-dim">
+        {selectedTemplate.content}
+      </p>
+
+      <div className="mt-5 flex gap-3">
+  <button
+    onClick={() => {
+      navigate(`/campaigns/create?template=${selectedTemplate.id}`)
+    }}
+    className="px-4 py-2 rounded bg-teal text-bg"
+  >
+    Use Template
+  </button>
+
+  <button
+    onClick={() => setSelectedTemplate(null)}
+    className="px-4 py-2 rounded bg-violet text-bg"
+  >
+    Close
+  </button>
+</div>
+    </div>
+  </div>
+)}
     </div>
   )
 }

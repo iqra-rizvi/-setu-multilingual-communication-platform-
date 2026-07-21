@@ -53,8 +53,15 @@ async def send_campaign(
     for recipient in recipients:
         lang_content = content_by_lang.get(recipient.language, default_content)
         personalized = await ai_service.personalize_content(
-            lang_content, recipient.name, recipient.occupation, recipient.organization
-        )
+    lang_content,
+    recipient.name,
+    recipient.occupation,
+    recipient.organization,
+    recipient.language,
+    recipient.state,
+    recipient.city,
+    recipient.engagement_score,
+)
         for channel in payload.channels:
             status = random.choices(
                 [models.MessageStatusEnum.delivered, models.MessageStatusEnum.sent, models.MessageStatusEnum.failed],

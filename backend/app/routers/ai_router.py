@@ -19,8 +19,10 @@ async def generate_content(
     if not campaign:
         raise HTTPException(404, "Campaign not found")
 
+    print("Selected Tone:", payload.tone)
     generated = await ai_service.generate_content(payload.brief, payload.tone, campaign.type.value)
     compliance = ai_service.check_compliance(generated)
+    sentiment = await ai_service.analyze_sentiment(generated)
 
     content = models.CampaignContent(
         campaign_id=campaign.id,
@@ -28,8 +30,10 @@ async def generate_content(
         tone=payload.tone,
         content=generated,
         generated_by_ai=True,
-        compliance_ok=compliance["ok"],
-        compliance_notes=compliance["notes"],
+        sentiment_score=sentiment["score"],
+        sentiment_label=sentiment["label"],
+        compliance_ok=compliance["compliance_ok"],
+        compliance_notes=compliance["compliance_notes"],
     )
     db.add(content)
     db.commit()
@@ -54,14 +58,17 @@ async def translate(
     results = []
     for lang, text in translations.items():
         compliance = ai_service.check_compliance(text)
+        sentiment = await ai_service.analyze_sentiment(text)
         row = models.CampaignContent(
             campaign_id=campaign.id,
             language=lang,
             tone=payload.tone,
             content=text,
             generated_by_ai=True,
-            compliance_ok=compliance["ok"],
-            compliance_notes=compliance["notes"],
+            sentiment_score=sentiment["score"],
+            sentiment_label=sentiment["label"],
+            compliance_ok=compliance["compliance_ok"],
+            compliance_notes=compliance["compliance_notes"],
         )
         db.add(row)
         results.append(row)
@@ -81,12 +88,19 @@ async def personalize(
     if not recipient:
         raise HTTPException(404, "Recipient not found")
     personalized = await ai_service.personalize_content(
-        payload.content, recipient.name, recipient.occupation, recipient.organization
-    )
+    payload.content,
+    recipient.name,
+    recipient.occupation,
+    recipient.organization,
+    recipient.language,
+    recipient.state,
+    recipient.city,
+    recipient.engagement_score,
+)
     return {"recipient_id": recipient.id, "personalized_content": personalized}
 
 
-@router.post("/sentiment")
+@router.post("/sentiment", response_model=schemas.SentimentResponse)
 async def sentiment(
     payload: schemas.SentimentRequest,
     _user: models.User = Depends(auth.get_current_user),

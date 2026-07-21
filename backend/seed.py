@@ -93,10 +93,13 @@ async def seed_campaigns():
 
         english = await ai_service.generate_content(camp_def["description"], camp_def["tone"], camp_def["type"].value)
         compliance = ai_service.check_compliance(english)
+        sentiment = await ai_service.analyze_sentiment(english)
         content_row = models.CampaignContent(
             campaign_id=campaign.id, language="English", tone=camp_def["tone"],
             content=english, generated_by_ai=True,
-            compliance_ok=compliance["ok"], compliance_notes=compliance["notes"],
+            sentiment_score=sentiment["score"], sentiment_label=sentiment["label"],
+            compliance_ok=compliance["compliance_ok"],
+            compliance_notes=compliance["compliance_notes"],
         )
         db.add(content_row)
 
@@ -105,9 +108,12 @@ async def seed_campaigns():
         content_by_lang = {"English": english}
         for lang, text in translations.items():
             c = ai_service.check_compliance(text)
+            s = await ai_service.analyze_sentiment(text)
             db.add(models.CampaignContent(
                 campaign_id=campaign.id, language=lang, tone=camp_def["tone"],
-                content=text, generated_by_ai=True, compliance_ok=c["ok"], compliance_notes=c["notes"],
+                content=text, generated_by_ai=True,
+                sentiment_score=s["score"], sentiment_label=s["label"],
+                compliance_ok=c["compliance_ok"], compliance_notes=c["compliance_notes"],
             ))
             content_by_lang[lang] = text
         db.commit()
@@ -117,7 +123,8 @@ async def seed_campaigns():
         for recipient in send_to:
             lang_content = content_by_lang.get(recipient.language, english)
             personalized = await ai_service.personalize_content(
-                lang_content, recipient.name, recipient.occupation, recipient.organization
+                lang_content, recipient.name, recipient.occupation, recipient.organization,
+                recipient.language, recipient.state, recipient.city, recipient.engagement_score,
             )
             for channel in camp_def["channels"]:
                 status = random.choices(

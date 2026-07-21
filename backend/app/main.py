@@ -5,7 +5,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import auth_router, audience_router, ai_router, distribution_router, analytics_router
+from .routers import auth_router, audience_router, ai_router, distribution_router, analytics_router, template_router
+from .routers import chatbot_router
+from app.routers import poster_router
+from .routers import bulletins
+
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -32,6 +37,10 @@ app.include_router(audience_router.router)
 app.include_router(ai_router.router)
 app.include_router(distribution_router.router)
 app.include_router(analytics_router.router)
+app.include_router(template_router.router)
+app.include_router(chatbot_router.router)
+app.include_router(poster_router.router)
+app.include_router(bulletins.router)
 
 
 @app.get("/")

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import api from '../api'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import api from '../services/api'
 
 const TYPE_COLORS = {
   awareness: 'text-teal border-teal/30 bg-teal/10',
@@ -14,6 +14,12 @@ const STATUS_LABEL = {
 }
 
 export default function Campaigns() {
+
+const [searchParams] = useSearchParams()
+const templateId = searchParams.get("template")
+console.log("Template ID:", templateId)
+
+
   const [campaigns, setCampaigns] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: '', description: '', type: 'awareness' })
@@ -24,7 +30,35 @@ export default function Campaigns() {
     api.get('/campaigns').then((res) => setCampaigns(res.data))
   }
 
-  useEffect(load, [])
+  useEffect(() => {
+  load()
+
+  if (templateId) {
+    setShowForm(true)
+  }
+}, [templateId])
+
+useEffect(() => {
+  async function loadTemplate() {
+    if (!templateId) return
+
+    try {
+      const res = await api.get(`/templates/${templateId}`)
+
+      setForm({
+        name: res.data.name,
+        description: res.data.content,
+        type: res.data.category
+      })
+
+    } catch (error) {
+      console.error("Template loading failed:", error)
+    }
+  }
+
+  loadTemplate()
+
+}, [templateId])
 
   async function handleCreate(e) {
     e.preventDefault()

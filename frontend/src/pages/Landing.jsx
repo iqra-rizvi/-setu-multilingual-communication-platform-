@@ -23,18 +23,7 @@ export default function Landing() {
       <nav className="flex items-center justify-between px-8 py-5 border-b border-border">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-signal animate-pulse" />
-          <span className="font-display font-semibold text-lg">Setu</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link to="/login" className="text-sm text-text-dim hover:text-text px-4 py-2 transition">
-            Sign in
-          </Link>
-          <Link
-            to="/register"
-            className="text-sm bg-signal text-bg font-medium px-4 py-2 rounded-lg hover:brightness-110 transition"
-          >
-            Get started
-          </Link>
+          <span className="font-display font-semibold text-lg">Setu.Conn</span>
         </div>
       </nav>
 

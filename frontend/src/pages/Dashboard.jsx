@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import api from '../api'
+import api from '../services/api'
 import StatCard from '../components/StatCard'
+import Chatbot from "../components/Chatbot";
 
 const CHANNEL_COLORS = { email: '#9B8CFF', sms: '#FFA94D', whatsapp: '#2DD4BF', push: '#60A5FA', web: '#F472B6' }
 
@@ -117,6 +118,7 @@ export default function Dashboard() {
         <StatCard label="Click Rate" value={data.click_rate} suffix="%" accent="violet" />
         <StatCard label="Messages Sent" value={data.total_messages} accent="teal" />
       </div>
+       <Chatbot />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import api from '../api'
+import api from '../services/api'
 
 const EMPTY_FORM = {
   name: '', email: '', phone: '', language: 'English', state: '', city: '',

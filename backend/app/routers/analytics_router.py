@@ -161,3 +161,37 @@ def campaigns_summary(db: Session = Depends(get_db), _user: models.User = Depend
             "click_rate": round((clicked / total) * 100, 1) if total else 0,
         })
     return summary
+
+
+@router.get("/sentiments")
+def content_sentiments(db: Session = Depends(get_db), _user: models.User = Depends(auth.get_current_user)):
+    """
+    Sentiment analysis of the campaign MESSAGES themselves (the AI-generated /
+    translated content) — is the message we're sending out positive, neutral,
+    or negative in tone? Distinct from /feedback, which analyzes recipient
+    responses instead of the outgoing message.
+    """
+    rows = db.query(models.CampaignContent).order_by(models.CampaignContent.created_at.desc()).all()
+
+    results = []
+    for r in rows:
+        campaign = db.query(models.Campaign).filter(models.Campaign.id == r.campaign_id).first()
+        results.append({
+            "id": r.id,
+            "campaign_id": r.campaign_id,
+            "campaign_name": campaign.name if campaign else "Unknown",
+            "campaign_type": campaign.type.value if campaign else None,
+            "language": r.language,
+            "tone": r.tone,
+            "content": r.content,
+            "sentiment_score": r.sentiment_score,
+            "sentiment_label": r.sentiment_label or "unrated",
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+        })
+
+    sentiment_totals = {"positive": 0, "neutral": 0, "negative": 0}
+    for r in results:
+        if r["sentiment_label"] in sentiment_totals:
+            sentiment_totals[r["sentiment_label"]] += 1
+
+    return {"total": len(results), "sentiment_totals": sentiment_totals, "messages": results}

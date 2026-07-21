@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import api from '../api'
+import api from '../services/api'
 
 const LANGUAGES = ['Hindi', 'Tamil', 'Bengali', 'Telugu', 'Marathi', 'Gujarati', 'Kannada', 'Malayalam', 'Punjabi', 'Odia']
 const CHANNELS = ['email', 'sms', 'whatsapp', 'push', 'web']

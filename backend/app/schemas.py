@@ -102,11 +102,25 @@ class CampaignOut(BaseModel):
 
 # ---------- AI Content ----------
 
+class SentimentRequest(BaseModel):
+    text: str
+
+class SentimentResponse(BaseModel):
+    score: float
+    label: str
+
+
+class ComplianceResponse(BaseModel):
+    compliance_ok: bool
+    compliance_notes: str
+    readability: str
+    suggestions: List[str]
+
+    
 class GenerateContentRequest(BaseModel):
     campaign_id: str
     brief: str
-    tone: str = "informative"  # informative | urgent | friendly | formal
-
+    tone: str = "informative"
 
 class TranslateRequest(BaseModel):
     campaign_id: str
@@ -119,11 +133,6 @@ class PersonalizeRequest(BaseModel):
     content: str
     recipient_id: str
 
-
-class SentimentRequest(BaseModel):
-    text: str
-
-
 class CampaignContentOut(BaseModel):
     id: str
     campaign_id: str
@@ -132,6 +141,7 @@ class CampaignContentOut(BaseModel):
     content: str
     generated_by_ai: bool
     sentiment_score: Optional[float] = None
+    sentiment_label: Optional[str] = None
     compliance_ok: bool
     compliance_notes: str
 
@@ -163,3 +173,11 @@ class TrackEventRequest(BaseModel):
     message_id: str
     event_type: str  # open | click | response | feedback
     comment: str = ""
+
+class ChatRequest(BaseModel):
+    question: str
+
+
+class ChatResponse(BaseModel):
+    answer: str
+      
